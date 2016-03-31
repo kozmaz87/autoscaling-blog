@@ -8,7 +8,7 @@
     template: "roles/infra2/files/asgdemo.template"
     template_parameters:
       KeyName: "{{ key_name }}"
-      InstanceType: "{{ instance_type }}"
+      InstanceType: "{{ instance_size }}"
       Subnets: "{{ subnets | to_nice_json }}"
       MinSize: "{{ min_size }}"
       MaxSize: "{{ max_size }}"
