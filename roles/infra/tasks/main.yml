@@ -16,7 +16,7 @@
     name: "{{ app_name }}"
     region: "{{ region }}"
     state: present
-    subnets: {{ subnets | to_json }}
+    subnets: "{{ subnets }}"
     security_group_ids: [ "{{ app_security_group.group_id }}" ]
     connection_draining_timeout: 60
     listeners:
