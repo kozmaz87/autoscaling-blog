@@ -5,7 +5,7 @@
     state: "present"
     region: "{{ region }}"
     disable_rollback: true
-    template: "../files/asgdemo.template"
+    template: "roles/infra2/files/asgdemo.template"
     template_parameters: {}
     tags:
       Stack: "ansible-cloudformation"
