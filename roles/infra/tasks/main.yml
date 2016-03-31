@@ -40,7 +40,7 @@
     image_id: "{{ ami }}"
     key_name: "{{ key_name }}"
     region: "{{ region }}"
-    security_groups: ["{{ app_security_group.group_id }},{{ tower_callback_client_group_id }},{{ tower_client_group_id }}"]
+    security_groups: "{{ app_security_group.group_id }},{{ tower_callback_client_group_id }},{{ tower_client_group_id }}"
     instance_type: "{{ instance_size }}"
     user_data: "{{ user_data }}"
   tags: launch_config
