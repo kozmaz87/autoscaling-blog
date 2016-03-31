@@ -48,12 +48,9 @@
         "DesiredCapacity": "2",
         "HealthCheckGracePeriod": "300",
         "HealthCheckType": "EC2",
-        "MaxSize": "4",
-        "MinSize": "2",
-        "VPCZoneIdentifier": [
-          "subnet-32203d4a",
-          "subnet-1f7c8e76"
-        ],
+        "MaxSize": "{{ max_size }}",
+        "MinSize": "{{ min_size }}",
+        "VPCZoneIdentifier": "{{ subnets | to_nice_json }}",
         "LaunchConfigurationName": {
           "Ref": "lcautoscaleblog"
         },
@@ -70,9 +67,9 @@
     "lcautoscaleblog": {
       "Type": "AWS::AutoScaling::LaunchConfiguration",
       "Properties": {
-        "ImageId": "ami-3cf61153",
-        "InstanceType": "t2.micro",
-        "KeyName": "testops",
+        "ImageId": "{{ ami }}",
+        "InstanceType": "{{ instance_size }}",
+        "KeyName": "{{ key_name }}",
         "SecurityGroups": [
           {
             "Ref": "sgautoscaleblog"
