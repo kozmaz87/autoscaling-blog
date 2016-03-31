@@ -9,7 +9,7 @@
     template_parameters:
       KeyName: "{{ key_name }}"
       InstanceType: "{{ instance_size }}"
-      Subnets: "{{ subnets | to_nice_json }}"
+      Subnets: "{{ subnets | join(', ') }}"
       MinSize: "{{ min_size }}"
       MaxSize: "{{ max_size }}"
       DesiredSize: "{{ desired_capacity }}"
