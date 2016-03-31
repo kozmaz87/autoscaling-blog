@@ -1,0 +1,236 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "elbautoscaleblog": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "Subnets": [
+          "subnet-1f7c8e76",
+          "subnet-32203d4a"
+        ],
+        "HealthCheck": {
+          "HealthyThreshold": "5",
+          "Interval": "30",
+          "Target": "HTTP:80/",
+          "Timeout": "5",
+          "UnhealthyThreshold": "5"
+        },
+        "ConnectionDrainingPolicy": {
+          "Enabled": "true",
+          "Timeout": "60"
+        },
+        "ConnectionSettings": {
+          "IdleTimeout": "60"
+        },
+        "SecurityGroups": [
+          {
+            "Ref": "sgautoscaleblog"
+          }
+        ],
+        "Listeners": [
+          {
+            "InstancePort": "80",
+            "LoadBalancerPort": "80",
+            "Protocol": "HTTP",
+            "InstanceProtocol": "HTTP"
+          }
+        ]
+      }
+    },
+    "asgautoscaleblog": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": [
+          "eu-central-1b",
+          "eu-central-1a"
+        ],
+        "Cooldown": "300",
+        "DesiredCapacity": "2",
+        "HealthCheckGracePeriod": "300",
+        "HealthCheckType": "EC2",
+        "MaxSize": "4",
+        "MinSize": "2",
+        "VPCZoneIdentifier": [
+          "subnet-32203d4a",
+          "subnet-1f7c8e76"
+        ],
+        "LaunchConfigurationName": {
+          "Ref": "lcautoscaleblog"
+        },
+        "LoadBalancerNames": [
+          {
+            "Ref": "elbautoscaleblog"
+          }
+        ],
+        "TerminationPolicies": [
+          "Default"
+        ]
+      }
+    },
+    "lcautoscaleblog": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": "ami-3cf61153",
+        "InstanceType": "t2.micro",
+        "KeyName": "testops",
+        "SecurityGroups": [
+          {
+            "Ref": "sgautoscaleblog"
+          },
+          "sg-a1100cc8",
+          "sg-a1100cc8"
+        ],
+        "UserData": "{{ user_data }}"
+      }
+    },
+    "sgautoscaleblog": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "autoscale-blog security group",
+        "VpcId": "vpc-1c9e7475"
+      }
+    },
+    "scalingscaledownpolicy": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "Cooldown": "300",
+        "ScalingAdjustment": "-1",
+        "AutoScalingGroupName": {
+          "Ref": "asgautoscaleblog"
+        }
+      }
+    },
+    "scalingscaleuppolicy": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "Cooldown": "300",
+        "ScalingAdjustment": "1",
+        "AutoScalingGroupName": {
+          "Ref": "asgautoscaleblog"
+        }
+      }
+    },
+    "alarmcpuhigh": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ActionsEnabled": "true",
+        "AlarmDescription": "This will alarm when cpu usage average is higher than 90% for 15 minutes ",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": "3",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/EC2",
+        "Period": "300",
+        "Statistic": "Average",
+        "Threshold": "90.0",
+        "Unit": "Percent",
+        "AlarmActions": [
+          {
+            "Ref": "scalingscaleuppolicy"
+          }
+        ],
+        "Dimensions": [
+          {
+            "Name": "AutoScalingGroupName",
+            "Value": "autoscale-blog"
+          }
+        ]
+      }
+    },
+    "alarmcpulow": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ActionsEnabled": "true",
+        "AlarmDescription": "This will alarm when cpu usage average is lower than 5% for 15 minutes ",
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "EvaluationPeriods": "3",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/EC2",
+        "Period": "300",
+        "Statistic": "Average",
+        "Threshold": "5.0",
+        "Unit": "Percent",
+        "AlarmActions": [
+          {
+            "Ref": "scalingscaledownpolicy"
+          }
+        ],
+        "Dimensions": [
+          {
+            "Name": "AutoScalingGroupName",
+            "Value": "autoscale-blog"
+          }
+        ]
+      }
+    },
+    "ingress5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgautoscaleblog"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress6": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgautoscaleblog"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "0",
+        "ToPort": "65535",
+        "SourceSecurityGroupId": {
+          "Ref": "sgautoscaleblog"
+        },
+        "SourceSecurityGroupOwnerId": "967165465090"
+      }
+    },
+    "ingress7": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgautoscaleblog"
+        },
+        "IpProtocol": "icmp",
+        "FromPort": "0",
+        "ToPort": "0",
+        "SourceSecurityGroupId": {
+          "Ref": "sgautoscaleblog"
+        },
+        "SourceSecurityGroupOwnerId": "967165465090"
+      }
+    },
+    "ingress8": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgautoscaleblog"
+        },
+        "IpProtocol": "udp",
+        "FromPort": "0",
+        "ToPort": "65535",
+        "SourceSecurityGroupId": {
+          "Ref": "sgautoscaleblog"
+        },
+        "SourceSecurityGroupOwnerId": "967165465090"
+      }
+    },
+    "egress2": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgautoscaleblog"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    }
+  },
+  "Description": "Autoscaler Demo"
+}
