@@ -35,7 +35,6 @@
 
 - name: create launch config
   ec2_lc:
-    ebs_optimized: True
     name: "{{ app_name }}"
     image_id: "{{ ami }}"
     key_name: "{{ key_name }}"
