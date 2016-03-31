@@ -1,3 +1,4 @@
 ---
 # defaults file for apache
 apache_test_message: This is a test -
+my_passed_data: "Nothing interesting"
