@@ -3,7 +3,7 @@
   roles:
   - apache
 
-- hosts: tag_aws_autoscaling_groupName_autoscale-blog
+- hosts: tag_ansible-group_webserver
   sudo: yes
   roles:
   - apache
