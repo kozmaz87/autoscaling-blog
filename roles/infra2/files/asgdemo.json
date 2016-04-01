@@ -163,8 +163,10 @@
             "Value" : {
               "Fn::Join": [
                 "-",
-                { "Ref": "AWS::StackName" },
-                "asgdemoweb"
+                [
+                  { "Ref": "AWS::StackName" },
+                  "asgdemoweb"
+                ]
               ]
             },
             "PropagateAtLaunch" : true
