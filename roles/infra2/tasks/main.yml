@@ -16,4 +16,4 @@
       AmiID: "{{ ami }}"
       UserData: "{{ user_data }}"
     tags:
-      Stack: "ansible-cloudformation"
+      Stack: "{{ stack_name }}"
