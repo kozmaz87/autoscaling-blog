@@ -151,6 +151,24 @@
         ],
         "TerminationPolicies": [
           "Default"
+        ],
+        "Tags": [
+          {
+            "Key" : "ansible-group",
+            "Value" : "webserver",
+            "PropagateAtLaunch" : true
+          },
+          {
+            "Key" : "Name",
+            "Value" : {
+              "Fn::Join": [
+                "-",
+                { "Ref": "AWS::StackName" },
+                "asgdemoweb"
+              ]
+            },
+            "PropagateAtLaunch" : true
+          }
         ]
       }
     },
